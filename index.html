@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Spesial Buat Kamu ❤️</title>
     <style>
         body {
@@ -13,21 +13,33 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             overflow: hidden;
+            padding: 10px;
+            box-sizing: border-box;
         }
+        
+        /* CONTAINER UTAMA: Sekarang pakai max-width biar fleksibel di HP */
         #game-container {
             position: relative;
-            width: 800px;
-            height: 320px;
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 800 / 320; /* Mengunci rasio game agar tidak gepeng */
+            margin: 0 auto;
         }
+
+        /* CANVAS: Otomatis mengecil mengikuti container di HP */
         canvas {
             background: linear-gradient(to bottom, #2c1a29, #0e1017);
             border: 3px solid #fd79a8;
             box-shadow: 0 0 20px rgba(253, 121, 168, 0.3);
             border-radius: 5px;
+            width: 100%;
+            height: 100%;
+            display: block;
         }
+
         /* LAYAR SURAT MAAF (START SCREEN) */
         #start-screen {
             position: absolute;
@@ -38,81 +50,99 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 20px;
+            padding: 15px;
             box-sizing: border-box;
             border-radius: 5px;
             z-index: 10;
+            overflow-y: auto; /* Jaga-jaga kalau teks kepanjangan di HP kecil */
         }
         #start-screen h2 {
             color: #ff7675;
-            margin-bottom: 10px;
+            margin: 0 0 8px 0;
+            font-size: 1.2rem;
         }
         #start-screen p {
             max-width: 600px;
-            font-size: 15px;
-            line-height: 1.6;
+            font-size: 13px;
+            line-height: 1.5;
             color: #ddd;
-            margin-bottom: 20px;
+            margin: 0 0 15px 0;
         }
         .btn {
             background-color: #fd79a8;
             color: white;
             border: none;
-            padding: 10px 25px;
-            font-size: 15px;
+            padding: 8px 20px;
+            font-size: 14px;
             cursor: pointer;
             border-radius: 20px;
             font-weight: bold;
             transition: 0.2s;
             box-shadow: 0 0 10px rgba(253, 121, 168, 0.5);
+            -webkit-tap-highlight-color: transparent; /* Hilangkan kotak abu-abu saat di-tap di iPhone */
         }
         .btn:hover {
             background-color: #e84393;
             transform: scale(1.05);
         }
+
         /* TOMBOL INTERAKTIF DI AKHIR GAME */
         #final-buttons {
             display: none;
             position: absolute;
-            bottom: 40px;
+            bottom: 15%; /* Diubah ke persen agar posisinya pas di semua ukuran iPhone */
             left: 50%;
             transform: translateX(-50%);
             z-index: 15;
-            gap: 20px;
+            gap: 15px;
+            width: 90%;
+            justify-content: center;
         }
         .btn-choice {
-            padding: 10px 30px;
-            font-size: 16px;
+            padding: 8px 20px;
+            font-size: 14px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
+            flex: 1;
+            max-width: 150px;
+            text-align: center;
+            -webkit-tap-highlight-color: transparent;
         }
         #btn-accept { background-color: #2ecc71; color: white; }
         #btn-reject { background-color: #e74c3c; color: white; position: relative; }
+
+        /* Judul Atas yang Fleksibel */
+        .title-game {
+            margin: 0 0 10px 0; 
+            color: #fd79a8; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            font-size: 1.2rem;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 
-    <div style="text-align: center; margin-bottom: 15px;">
-        <h1 style="margin: 0; color: #fd79a8; text-transform: uppercase; letter-spacing: 1px; font-size: 24px;">A Journey to You ❤️</h1>
-    </div>
+    <h1 class="title-game">A Journey to You ❤️</h1>
     
     <div id="game-container">
         <div id="start-screen">
-            <h2>Buat Pacarku Tersayang... 📝</h2>
+            <h2>Buat Jeanneku Tersayang... 📝</h2>
             <p>
-                Maafin aku ya sayang... aku sebenarnya bukan menaruh dirimu di urutan keberapa dri prioritasku tapi jujur aku udah kangen banget buatin codingan dan pengen buat kmu lebih senang daripada sekedar pujian biasa. mknya aku tdi minta banyak fotonya karna aku mau jadiin codingan maaf ya sayang karna nda terus. 
+                Maafin aku ya sayang... aku sebenarnya bukan menaruh dirimu di urutan keberapa dri prioritasku tapi jujur aku udah kangen banget buatin codingan dan pengen buat kmu lebih senang daripada sekedar pujian biasa. mknya aku tdi minta banyak fotonya karna aku mau jadiin codingan maaf ya sayang karna nda terus.
             </p>
             <button class="btn" onclick="startGame()">Mulai Perjalanan 🥰</button>
         </div>
 
         <canvas id="dashCanvas" width="800" height="320"></canvas>
 
-<div id="final-buttons">
-    <button class="btn-choice" id="btn-accept" onclick="answerMaaf(true)">Iya, Dimaafin! ❤️</button>
-    <button class="btn-choice" id="btn-reject" onclick="answerMaaf(false)">Nggak 😜</button>
-</div>
+        <div id="final-buttons">
+            <button class="btn-choice" id="btn-accept" onclick="answerMaaf(true)">Iya, Dimaafin! ❤️</button>
+            <button class="btn-choice" id="btn-reject" onclick="answerMaaf(false)">Nggak 😜</button>
+        </div>
     </div>
 
     <script src="script.js"></script>
